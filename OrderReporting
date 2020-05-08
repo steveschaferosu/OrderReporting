@@ -1,0 +1,182 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.Stack;
+/**
+ * Simple Product Report
+ * 
+ * A Simple Product reporting.
+ * 
+ * @author Steve Schafer
+ * @version 20200302
+ */
+public class OrderReporting {
+
+	public static void main(String[] args) {
+		Scanner keyboard = new Scanner(System.in);
+		System.out.print("Enter database filename: ");
+		String input = keyboard.nextLine();
+		// First Part
+		ArrayList<SimpleProduct> arr = inventory(input);
+		// Checks if ArrayList has SimpleProduct objects
+		if (!arr.isEmpty()) {
+			Queue<SimpleProduct> bill = orders(arr);
+			System.out.println("-------------------------------------------------------------------------------");
+
+			// Second Part
+			System.out.println();
+			System.out.println("Orders Outstanding For:                                                         ");
+			customer(input);
+			System.out.println("-------------------------------------------------------------------------------");
+			Stack<SimpleProduct> myS = outstandingOrders(arr);
+
+		}
+		keyboard.close();
+	}
+
+	public static ArrayList<SimpleProduct> inventory(String input) {
+		ArrayList<SimpleProduct> inventory = new ArrayList<>();
+		try {
+			File inputFile = new File(input);
+			Scanner textScanner = new Scanner(inputFile);
+
+			String customerLN = textScanner.nextLine();
+			String customerFN = textScanner.nextLine();
+			String customerStreet = textScanner.nextLine();
+			String customerCity = textScanner.nextLine();
+			String customerState = textScanner.nextLine();
+			String customerZIP = textScanner.nextLine();
+			Double customerSalesTax = textScanner.nextDouble();
+			textScanner.nextLine();
+			System.out.println("Shipping To: ");
+			System.out.println("        " + customerFN + " " + customerLN);
+			System.out.println("        " + customerStreet);
+			System.out.println("        " + customerCity + " " + customerState + " " + customerZIP);
+
+			System.out.println("-------------------------------------------------------------------------------");
+			while (textScanner.hasNext()) {
+
+				String productName = textScanner.nextLine();
+				String productType = textScanner.nextLine();
+				Double productPrice = textScanner.nextDouble();
+				textScanner.nextLine();
+				int productQuantity = textScanner.nextInt();
+				textScanner.nextLine();
+				String Stock = textScanner.nextLine();
+				boolean inStock = Boolean.parseBoolean(Stock);
+
+				SimpleProduct p1 = new SimpleProduct();
+				p1.setName(productName);
+				p1.setType(productType);
+				p1.setPrice(productPrice);
+				p1.setQuantity(productQuantity);
+				p1.setInStock(inStock);
+
+				// Adds to product ArrayList
+
+				inventory.add(p1);
+			}
+			textScanner.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("Error - cannot open file " + input);
+		}
+		return inventory;
+	}
+
+	public static void customer(String input) {
+		try {
+			File inputFile = new File(input);
+			Scanner textScanner = new Scanner(inputFile);
+
+			String customerLN = textScanner.nextLine();
+			String customerFN = textScanner.nextLine();
+			String customerStreet = textScanner.nextLine();
+			String customerCity = textScanner.nextLine();
+			String customerState = textScanner.nextLine();
+			String customerZIP = textScanner.nextLine();
+			Double customerSalesTax = textScanner.nextDouble();
+
+			System.out.println("        " + customerFN + " " + customerLN);
+			System.out.println("        " + customerStreet);
+			System.out.println("        " + customerCity + " " + customerState + " " + customerZIP);
+			textScanner.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("Error - cannot open file " + input);
+		}
+
+	}
+
+	public static Queue<SimpleProduct> orders(ArrayList<SimpleProduct> inventory) {
+		Queue<SimpleProduct> myQ = new LinkedList<>();
+		double subTotal = 0;
+		for (int i = 0; i < inventory.size(); i++) {
+			SimpleProduct order = inventory.get(i);
+			if (order.getInStock()) {
+				myQ.add(order);
+
+				SimpleProduct p1 = inventory.get(i);
+				String productName = p1.getName();
+				String productType = "(" + p1.getType() + ")";
+				Double productPrice = p1.getPrice();
+				int productQuantity = p1.getQuantity();
+				String x = " x ";
+				System.out.format("%3s %2s %-31s %6s %18.30s", productQuantity, x, productName, productType,
+						productPrice * productQuantity);
+				System.out.println();
+				subTotal += p1.getPrice();
+			}
+
+		}
+		System.out.println("  ---------------------------------------------------------------------------");
+		subTotal = Math.round(subTotal * 100);
+		subTotal = subTotal / 100;
+		System.out.println("  Subtotal:                                                 " + subTotal + "0");
+		double salesTax = subTotal * .07;
+		salesTax = Math.round(salesTax * 100);
+		salesTax = salesTax / 100;
+		System.out.println("  Sales Tax: (0.07)                                          " + salesTax);
+		System.out.println("  Shipping:                                                  0.00");
+		System.out.println("  ---------------------------------------------------------------------------");
+		double total = subTotal + salesTax;
+		total = Math.round(total * 100);
+		total = total / 100;
+		System.out.println("  Total:                                                    " + total);
+		return myQ;
+
+	}
+
+	public static Stack<SimpleProduct> outstandingOrders(ArrayList<SimpleProduct> inventory) {
+		Stack<SimpleProduct> myS = new Stack<>();
+		// need to pop after pushing elements onto the stack
+		double total = 0;
+		for (int i = 0; i < inventory.size(); i++) {
+			SimpleProduct order = inventory.get(i);
+			if (!order.getInStock()) {
+				myS.push(order);
+			}
+		}
+		for (int j = 0; j < inventory.size(); j++) {
+			SimpleProduct order = inventory.get(j);
+			if (!order.getInStock()) {
+				SimpleProduct p1 = myS.pop();
+				String productName = p1.getName();
+				String productType = "(" + p1.getType() + ")";
+				Double productPrice = p1.getPrice();
+				int productQuantity = p1.getQuantity();
+				String x = " x ";
+				total += productPrice * productQuantity;
+				System.out.format("%3s %2s %-31s %6s %18.30s", productQuantity, x, productName, productType,
+						productPrice * productQuantity);
+				System.out.println();
+			}
+		}
+
+		System.out.println("  ---------------------------------------------------------------------------");
+		System.out.println("  Outstanding Balance:                                     " + total);
+		System.out.println("-------------------------------------------------------------------------------");
+		return myS;
+	}
+}
