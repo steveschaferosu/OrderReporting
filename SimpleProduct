@@ -1,0 +1,101 @@
+/**
+ * Simple Product
+ * 
+ * A Simple Product object using the product interface.
+ * 
+ * @author Steve Schafer
+ * @version 20200302
+ */
+public class SimpleProduct implements Product {
+
+	private String name;
+	private String type;
+	private double price;
+	private int quantity;
+	private boolean stock;
+
+	public SimpleProduct() {
+
+	}
+
+	public SimpleProduct(String name, String type, double price, int quantity, boolean stock) {
+		this.name = name;
+		this.type = type;
+		this.price = price;
+		this.quantity = quantity;
+		this.stock = stock;
+	}
+
+	@Override
+	public void setName(String name) {
+		this.name = name;
+
+	}
+
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	@Override
+	public void setType(String type) {
+		this.type = type;
+
+	}
+
+	@Override
+	public String getType() {
+		return this.type;
+	}
+
+	@Override
+	public void setPrice(double price) {
+		this.price = price;
+
+	}
+
+	@Override
+	public double getPrice() {
+		return this.price;
+	}
+
+	@Override
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+
+	}
+
+	@Override
+	public int getQuantity() {
+		return this.quantity;
+	}
+
+	@Override
+	public void setInStock(boolean inStock) {
+		this.stock = inStock;
+
+	}
+
+	@Override
+	public boolean getInStock() {
+		return this.stock;
+	}
+
+	// returns true if the name and type of the Product are the same.
+	@Override
+	public boolean equals(Object obj) {
+		SimpleProduct p1 = new SimpleProduct();
+		boolean equals = false;
+		if (((SimpleProduct) obj).getName() == p1.getName() && ((SimpleProduct) obj).getType() == p1.getType()) {
+			equals = true;
+		}
+		return equals;
+	}
+
+	// returns a string: name,type,price,quantity of the product with comma and
+	// parentheses.
+	@Override
+	public String toString() {
+		return "(" + this.name + "," + this.type + "," + this.price + "," + this.quantity + ")";
+	}
+}
